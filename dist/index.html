@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="PM Report System workspace for Solaris PM report generation.">
+    <title>PM Report System</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" data-action="home" aria-label="PM Report System home">
+          <span>PM Report</span>
+          <strong>System</strong>
+        </a>
+        <nav class="nav-tabs" aria-label="Primary navigation">
+          <button class="nav-tab is-active" type="button" data-route="workspace">Workspace</button>
+          <button class="nav-tab" type="button" data-route="history">History Log</button>
+        </nav>
+      </header>
+
+      <main class="main-content">
+        <section class="view view-workspace is-active" id="workspace-view" aria-labelledby="workspace-heading">
+          <div class="selection-screen" id="selection-screen">
+            <div class="page-intro">
+              <h1 id="workspace-heading">PM Report <span>System</span></h1>
+              <p>Select a customer to generate, review, and finalize PM reports.</p>
+            </div>
+
+            <div class="customer-grid" aria-label="Customer selection">
+              <button class="customer-card is-available" type="button" data-customer="solaris">
+                <span class="card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M4 5h8v14H4zM12 9h8v10h-8zM7 9h2M7 13h2M7 17h2M15 13h2M15 17h2"/>
+                  </svg>
+                </span>
+                <span>Solaris Server</span>
+              </button>
+
+              <button class="customer-card is-disabled" type="button" aria-disabled="true">
+                <span class="card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M4 7h11v8H4zM15 10h3l2 3v2h-5zM7 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                  </svg>
+                </span>
+                <span>Dell Server</span>
+              </button>
+
+              <button class="customer-card is-disabled" type="button" aria-disabled="true">
+                <span class="card-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M4 10h16M6 10v8M10 10v8M14 10v8M18 10v8M4 20h16M5 8l7-4 7 4z"/>
+                  </svg>
+                </span>
+                <span>KWSP</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-screen" id="form-screen" hidden>
+            <button class="back-link" type="button" data-action="back">&larr; Back to Selection</button>
+            <h2>Customer Information</h2>
+
+            <form class="report-form" id="report-form">
+              <div class="field field-full">
+                <label for="company-name">Company Name</label>
+                <input id="company-name" name="companyName" type="text" placeholder="e.g. Oracle Systems Malaysia" autocomplete="organization" required>
+              </div>
+
+              <div class="field field-full">
+                <label for="company-logo">Company Logo</label>
+                <div class="file-row">
+                  <input id="company-logo" name="companyLogo" type="file" accept="image/*">
+                  <span class="logo-name" id="logo-name">No file chosen</span>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label for="ticket-id">Ticket ID</label>
+                  <input id="ticket-id" name="ticketId" type="text" placeholder="2112344" inputmode="numeric">
+                </div>
+
+                <div class="field">
+                  <label for="contract-id">Contract ID</label>
+                  <input id="contract-id" name="contractId" type="text" placeholder="e.g. CTR-9902X">
+                </div>
+
+                <div class="field">
+                  <label id="category-label">Category</label>
+                  <div class="select-control" data-select="category">
+                    <button class="select-button" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="category-label category-value">
+                      <span id="category-value">Select Category</span>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="m7 10 5 5 5-5"/>
+                      </svg>
+                    </button>
+                    <div class="select-menu" role="listbox" aria-labelledby="category-label" hidden>
+                      <button type="button" role="option" data-value="" aria-selected="true">Select Category</button>
+                      <button type="button" role="option" data-value="yearly">Yearly</button>
+                      <button type="button" role="option" data-value="half-yearly">Half Yearly</button>
+                      <button type="button" role="option" data-value="quarterly">Quarterly</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label id="subcategory-label">Sub-Category</label>
+                  <div class="select-control is-disabled" data-select="subcategory">
+                    <button class="select-button" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="subcategory-label subcategory-value" disabled>
+                      <span id="subcategory-value">Please choose the Category first</span>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="m7 10 5 5 5-5"/>
+                      </svg>
+                    </button>
+                    <div class="select-menu" role="listbox" aria-labelledby="subcategory-label" hidden></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field field-full">
+                <label for="system-files">System Files</label>
+                <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Attach system files">
+                  <input id="system-files" name="systemFiles" type="file" multiple accept=".csv,.txt,text/csv,text/plain">
+                  <strong id="drop-title">Click to drag or attach files</strong>
+                  <span>Supports multiple structured CSV files (Up to 200 files per session)</span>
+                </div>
+                <div class="file-list" id="file-list" aria-live="polite"></div>
+              </div>
+
+              <button class="generate-button" type="submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M5 5h14v14H5zM8 16v-4M12 16V8M16 16v-6"/>
+                </svg>
+                Generate PM Report
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <section class="view view-history" id="history-view" aria-labelledby="history-heading">
+          <div class="history-header">
+            <div>
+              <h1 id="history-heading">History Log</h1>
+              <p>Generated PM report sessions are stored on this browser.</p>
+            </div>
+            <button class="secondary-button" type="button" id="clear-history">Clear Log</button>
+          </div>
+
+          <div class="history-list" id="history-list"></div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>&copy; 2026 PM Report System. All rights reserved.</p>
+      </footer>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
