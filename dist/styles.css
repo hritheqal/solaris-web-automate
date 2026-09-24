@@ -608,6 +608,11 @@ input[type="file"] {
   line-height: 1.45;
 }
 
+.history-item .history-report {
+  margin-top: 4px;
+  color: #1d2735;
+}
+
 .history-badge {
   min-width: 120px;
   border-radius: 4px;
