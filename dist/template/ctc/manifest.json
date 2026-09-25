@@ -1,0 +1,134 @@
+{
+  "files": [
+    {
+      "name": "[Content_Types].xml",
+      "path": "[Content_Types].xml",
+      "type": "text"
+    },
+    {
+      "name": "_rels/.rels",
+      "path": "_rels/.rels",
+      "type": "binary"
+    },
+    {
+      "name": "docProps/core.xml",
+      "path": "docProps/core.xml",
+      "type": "text"
+    },
+    {
+      "name": "docProps/app.xml",
+      "path": "docProps/app.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/document.xml",
+      "path": "word/document.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/_rels/document.xml.rels",
+      "path": "word/_rels/document.xml.rels",
+      "type": "text"
+    },
+    {
+      "name": "word/styles.xml",
+      "path": "word/styles.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/stylesWithEffects.xml",
+      "path": "word/stylesWithEffects.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/settings.xml",
+      "path": "word/settings.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/webSettings.xml",
+      "path": "word/webSettings.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/fontTable.xml",
+      "path": "word/fontTable.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/theme/theme1.xml",
+      "path": "word/theme/theme1.xml",
+      "type": "text"
+    },
+    {
+      "name": "customXml/item1.xml",
+      "path": "customXml/item1.xml",
+      "type": "text"
+    },
+    {
+      "name": "customXml/_rels/item1.xml.rels",
+      "path": "customXml/_rels/item1.xml.rels",
+      "type": "text"
+    },
+    {
+      "name": "customXml/itemProps1.xml",
+      "path": "customXml/itemProps1.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/numbering.xml",
+      "path": "word/numbering.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/media/image1.png",
+      "path": "word/media/image1.png",
+      "type": "binary"
+    },
+    {
+      "name": "word/media/image2.png",
+      "path": "word/media/image2.png",
+      "type": "binary"
+    },
+    {
+      "name": "word/media/image3.png",
+      "path": "word/media/image3.png",
+      "type": "binary"
+    },
+    {
+      "name": "word/header1.xml",
+      "path": "word/header1.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/header2.xml",
+      "path": "word/header2.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/header3.xml",
+      "path": "word/header3.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/footer1.xml",
+      "path": "word/footer1.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/footer2.xml",
+      "path": "word/footer2.xml",
+      "type": "text"
+    },
+    {
+      "name": "word/footer3.xml",
+      "path": "word/footer3.xml",
+      "type": "text"
+    },
+    {
+      "name": "docProps/thumbnail.jpeg",
+      "path": "docProps/thumbnail.jpeg",
+      "type": "binary"
+    }
+  ]
+}

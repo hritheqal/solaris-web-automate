@@ -14,6 +14,7 @@
   };
 
   var storageKey = "pm-report-system-history";
+  var templateCache = null;
 
   var routes = {
     workspace: document.getElementById("workspace-view"),
@@ -743,7 +744,7 @@
       "</w:styles>";
   }
 
-  function buildDocxFiles(record) {
+  function buildGeneratedDocxFiles(record) {
     var now = record.generatedAtIso;
     return [
       {
@@ -801,6 +802,149 @@
           "</Properties>"
       }
     ];
+  }
+
+  function templatePartUrl(path) {
+    return "template/ctc/" + String(path).split("/").map(function (segment) {
+      return encodeURIComponent(segment);
+    }).join("/");
+  }
+
+  function fetchTemplateFiles() {
+    if (templateCache) return templateCache;
+
+    templateCache = fetch(templatePartUrl("manifest.json")).then(function (response) {
+      if (!response.ok) throw new Error("Could not load CTC template manifest.");
+      return response.json();
+    }).then(function (manifest) {
+      return Promise.all((manifest.files || []).map(function (part) {
+        return fetch(templatePartUrl(part.path)).then(function (response) {
+          if (!response.ok) throw new Error("Could not load template part " + part.path + ".");
+          if (part.type === "text") {
+            return response.text().then(function (text) {
+              return { name: part.name, data: text };
+            });
+          }
+          return response.arrayBuffer().then(function (buffer) {
+            return { name: part.name, data: new Uint8Array(buffer) };
+          });
+        });
+      }));
+    }).catch(function (error) {
+      templateCache = null;
+      throw error;
+    });
+
+    return templateCache;
+  }
+
+  function templateValueXml(value) {
+    var text = normalizeOutput(value) || "-";
+    return xmlEscape(text).split(/\r\n|\n|\r/).map(function (line, index) {
+      return (index ? '</w:t><w:br/><w:t xml:space="preserve">' : "") + line;
+    }).join("");
+  }
+
+  function outputTokenBase(section) {
+    return String(section || "output")
+      .replace(/[^a-z0-9]+/gi, "_")
+      .replace(/^_+|_+$/g, "")
+      .toUpperCase() || "OUTPUT";
+  }
+
+  function formatIsoDate(value) {
+    if (!value) return "";
+    var date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toISOString().slice(0, 10);
+  }
+
+  function buildTemplateValues(record) {
+    var data = record.reportData || buildReportData(record.sourceRows || []);
+    var companyName = record.companyName || "-";
+    var values = {
+      COMPANY_NAME: companyName,
+      COMPANY_NAME_UPPER: companyName.toUpperCase(),
+      COMPANY_NAME_LOWER: companyName,
+      PM_REPORT_DATE: formatIsoDate(record.generatedAtIso) || data.reportDate || record.createdAt,
+      TICKET_ID: record.ticketId || "-",
+      CONTRACT_ID: record.contractId || "-",
+      CONTRACT_PERIOD: "-",
+      HOSTNAME: data.hostname || "-",
+      MODEL: data.model || "-",
+      CSV_DATE: data.reportDate || "-",
+      UPTIME: data.uptime || "-",
+      SERIAL_NUMBER: data.serialNumber || "-",
+      FIRMWARE_VERSION: data.firmwareVersion || "-",
+      OS_INFORMATION: data.osInfo || "-",
+      DISK_MANAGEMENT: data.diskManagement || "-"
+    };
+    var sectionCounts = {};
+
+    (record.sourceRows || []).forEach(function (row) {
+      var section = row.Section || "Output";
+      var base = outputTokenBase(section);
+      sectionCounts[base] = (sectionCounts[base] || 0) + 1;
+      values["OUTPUT_" + base + "_" + sectionCounts[base]] = normalizeOutput(row.Output) || "-";
+    });
+
+    return values;
+  }
+
+  function patchTemplateTokens(xml, record) {
+    var values = buildTemplateValues(record);
+    Object.keys(values).forEach(function (key) {
+      var token = "{{" + key + "}}";
+      if (xml.indexOf(token) !== -1) {
+        xml = xml.split(token).join(templateValueXml(values[key]));
+      }
+    });
+    return xml;
+  }
+
+  function appendDetailedOutputToTemplate(xml, record) {
+    var bodyEnd = xml.lastIndexOf("</w:body>");
+    if (bodyEnd === -1) return xml;
+
+    var insertAt = xml.lastIndexOf("<w:sectPr", bodyEnd);
+    if (insertAt === -1) insertAt = bodyEnd;
+
+    return xml.slice(0, insertAt) + pageBreak() + buildDetailedOutput(record) + xml.slice(insertAt);
+  }
+
+  function buildCorePropertiesXml(record) {
+    var now = record.generatedAtIso || new Date().toISOString();
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+      "<dc:title>" + xmlEscape("PM Report - " + record.companyName) + "</dc:title>" +
+      "<dc:creator>PM Report System</dc:creator>" +
+      "<cp:lastModifiedBy>PM Report System</cp:lastModifiedBy>" +
+      '<dcterms:created xsi:type="dcterms:W3CDTF">' + xmlEscape(now) + "</dcterms:created>" +
+      '<dcterms:modified xsi:type="dcterms:W3CDTF">' + xmlEscape(now) + "</dcterms:modified>" +
+      "</cp:coreProperties>";
+  }
+
+  function buildTemplateDocxFiles(record) {
+    return fetchTemplateFiles().then(function (templateFiles) {
+      return templateFiles.map(function (file) {
+        if (file.name === "word/document.xml") {
+          return {
+            name: file.name,
+            data: appendDetailedOutputToTemplate(patchTemplateTokens(file.data, record), record)
+          };
+        }
+        if (file.name === "docProps/core.xml") {
+          return { name: file.name, data: buildCorePropertiesXml(record) };
+        }
+        return { name: file.name, data: file.data };
+      });
+    });
+  }
+
+  function buildDocxFiles(record) {
+    return buildTemplateDocxFiles(record).catch(function () {
+      return buildGeneratedDocxFiles(record);
+    });
   }
 
   var crcTable;
@@ -911,8 +1055,8 @@
     }, 1000);
   }
 
-  function downloadReport(record) {
-    var reportBlob = createZip(buildDocxFiles(record));
+  async function downloadReport(record) {
+    var reportBlob = createZip(await buildDocxFiles(record));
     downloadBlob(reportBlob, record.reportFileName);
   }
 
@@ -1155,7 +1299,7 @@
     };
 
     try {
-      downloadReport(record);
+      await downloadReport(record);
     } catch (error) {
       showToast("Could not download the PM report. Please try again.");
       return;
